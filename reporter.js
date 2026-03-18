@@ -23,6 +23,7 @@ class Reporter {
      * @param {Boolean} options.isSharded=false - use if using shardOnSpec of multiCapabilities options in protractor
      * @param {Object} options.cleanDirectory=true - clean directory of where reports are saved
      * @param {Object} options.dataFileName=null - use configured string for generated data files
+     * @param {Array} options.defaultStatuses=[] - the default statuses to show (passed/failed/pending/disabled)
      */
 
     constructor(options) {
@@ -144,15 +145,18 @@ class Reporter {
 
         // suspectLine
         result.failedExpectations.forEach(failure => {
-            failure.hasSuspectLine = failure.stack.split('\n').some(function (line) {
-                let match = line.indexOf('Error:') === -1 && line.indexOf('node_modules') === -1;
+            failure.hasSuspectLine =
+                failure.stack
+                    ? failure.stack.split('\n').some(function (line) {
+                        let match = line.indexOf('Error:') === -1 && line.indexOf('node_modules') === -1;
 
-                if (match) {
-                    failure.suspectLine = line;
-                }
+                        if (match) {
+                          failure.suspectLine = line;
+                        }
 
-                return match;
-            });
+                        return match;
+                    })
+                    : false;
         });
 
         if (this.options.writeReportEachSpec) {
@@ -228,7 +232,8 @@ class Reporter {
             highlightSuspectLine: true,
             isSharded: false,
             cleanDirectory: true,
-            dataFileName: null
+            dataFileName: null,
+            defaultStatuses: [],
         };
     }
 
