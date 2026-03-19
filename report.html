@@ -239,9 +239,9 @@
                 <md-subheader ng-if="activeItem.failedExpectations.length > 0">Stack Traces</md-subheader>
                 <div flex layout="column" layout-padding ng-repeat="failure in activeItem.failedExpectations">
                     <div flex>
-                        <p>{{failure.message}}</p>
+                        <p ng-bind-html="failure.message | linkify"></p>
                         <small>
-                            <pre class="stack" ng-class="{'highlight': (filteredResults.options.highlightSuspectLine && line === failure.suspectLine) }" ng-repeat="line in failure.stack.split('\n')">{{line}}</pre>
+                            <pre class="stack" ng-class="{'highlight': (filteredResults.options.highlightSuspectLine && line === failure.suspectLine) }" ng-repeat="line in failure.stack.split('\n')" ng-bind-html="line | linkify"></pre>
                         </small>
                     </div>
                 </div>
@@ -288,6 +288,15 @@
 <script>
     var jasmineResults = angular.module('jasmineResults', ['ngMaterial']).config(function ($mdThemingProvider) {
         $mdThemingProvider.theme('default').primaryPalette('green').accentPalette('yellow');
+    });
+
+    jasmineResults.filter('linkify', function ($sce) {
+        return function (text) {
+            if (!text) return text;
+            var escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            var linked = escaped.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+            return $sce.trustAsHtml(linked);
+        };
     });
 
     jasmineResults.controller('ResultsCtrl', function ($scope, $mdDialog, RESULTS) {
