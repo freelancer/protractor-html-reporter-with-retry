@@ -294,7 +294,7 @@
         return function (text) {
             if (!text) return text;
             var escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            var linked = escaped.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+            var linked = escaped.replace(/(https?:\/\/\S*[^\s.,;:!?)\]}>])/g, '<a href="$1" target="_blank">$1</a>');
             return $sce.trustAsHtml(linked);
         };
     });
